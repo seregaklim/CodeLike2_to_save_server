@@ -103,6 +103,9 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun likeById(id: Long) {
+
+
+
         repository.likeByIdASync(id, object : PostRepository.Callback<Post> {
             override fun onSuccess(post: Post) {
                 _data.postValue(
