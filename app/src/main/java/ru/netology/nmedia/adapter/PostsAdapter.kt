@@ -20,7 +20,6 @@ interface OnInteractionListener {
     fun onEdit(post: Post) {}
     fun onRemove(post: Post) {}
     fun onShare(post: Post) {}
-   // fun onNewer(){}
 }
 
 class PostsAdapter (
@@ -57,7 +56,7 @@ class PostViewHolder(
             avatar.loadCircleCrop("${BuildConfig.BASE_URL}/avatars/${post.authorAvatar}")
             like.isChecked = post.likedByMe
             like.text = "${post.likes}"
-           // newer.text= post.newer.toString()
+
 
             menu.setOnClickListener {
                 PopupMenu(it.context, it).apply {

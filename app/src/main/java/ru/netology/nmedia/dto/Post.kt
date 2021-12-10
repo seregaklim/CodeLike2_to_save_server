@@ -10,7 +10,7 @@ data class Post(
     val likedByMe:Boolean,
     val likes: Int,
     val authorAvatar: String,
-    val newer:Long,
+    var newer:Long,
     val attachment: Attachment? = null
     )
 
