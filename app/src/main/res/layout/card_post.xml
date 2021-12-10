@@ -114,18 +114,18 @@
             app:layout_constraintStart_toEndOf="@+id/like"
             app:layout_constraintTop_toBottomOf="@id/footer" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/newer"
-            style="@style/Widget.AppTheme.newMessageCheckBox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checkable="true"
-            android:contentDescription="@string/description_post_newer"
-            app:icon="@drawable/outline_mark_email_unread_24"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/content"
-            tools:checked="@sample/posts.json/data/newerByMe"
-            tools:text="@sample/posts.json/data/newer" />
+<!--        <com.google.android.material.button.MaterialButton-->
+<!--            android:id="@+id/newer"-->
+<!--            style="@style/Widget.AppTheme.newMessageCheckBox"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:checkable="true"-->
+<!--            android:contentDescription="@string/description_post_newer"-->
+<!--            app:icon="@drawable/outline_mark_email_unread_24"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintTop_toBottomOf="@+id/content"-->
+<!--            tools:checked="@sample/posts.json/data/newerByMe"-->
+<!--            tools:text="@sample/posts.json/data/newer" />-->
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

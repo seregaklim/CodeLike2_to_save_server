@@ -1,11 +1,10 @@
-
 package ru.netology.nmedia.activity
-
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.PopupMenu
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -20,7 +19,15 @@ import ru.netology.nmedia.enumeration.AttachmentType
 import ru.netology.nmedia.model.ActionType
 import ru.netology.nmedia.viewmodel.PostViewModel
 
-
+val post =Post(   id = 0,
+    content = "",
+    author = "",
+    authorAvatar = "",
+    likedByMe = false,
+    likes = 0,
+    published = "",
+    newer=0,
+)
 
 class FeedFragment : Fragment() {
 
@@ -41,11 +48,10 @@ class FeedFragment : Fragment() {
                     viewModel.edit(post)
                 }
 
-                override fun onNewer() {
+                fun onNewer() {
                     viewModel.refreshPosts()
                     viewModel.unCountNewer()
                 }
-
 
                 override fun onLike(post: Post) {
                     if (post.likedByMe) {
@@ -113,14 +119,19 @@ class FeedFragment : Fragment() {
         viewModel.data.observe(viewLifecycleOwner, { state ->
             adapter.submitList(state.posts)
             binding.emptyText.isVisible = state.empty
+
         })
 
+        binding. newer.visibility = View.INVISIBLE  //невидимая
 
         viewModel.newerCount.observe(viewLifecycleOwner) {
             viewModel.countMessegePost()
             Snackbar.make(binding.root,R.string.add_post, Snackbar.LENGTH_LONG).show()
-
-        }
+            binding.newer.visibility =   if (binding.newer.visibility > 0) {
+                    View.INVISIBLE  //невидимая
+                } else View.VISIBLE
+                binding.newer.text = post.newer.toString()
+            }
 
         binding.swiperefresh.setOnRefreshListener {
             viewModel.refreshPosts()
@@ -130,25 +141,14 @@ class FeedFragment : Fragment() {
             findNavController().navigate(R.id.action_feedFragment_to_newPostFragment)
         }
 
-//        val post =Post(   id = 0,
-//            content = "",
-//            author = "",
-//            authorAvatar = "",
-//            likedByMe = false,
-//            likes = 0,
-//            published = "",
-//            newer=0,
-//        )
+        binding.newer.setOnClickListener {
+            viewModel.refreshPosts()
+            viewModel.unCountNewer()
+            binding. newer.visibility = View.INVISIBLE  //невидимая
 
-//        binding.newer.text = post.newer.toString()
-//
-//        binding.newer.setOnClickListener {
-//           viewModel.refreshPosts()
-//           viewModel.unCountNewer()
-//        }
-//
-       return binding.root
+        }
 
+        return binding.root
     }
 }
 
@@ -162,21 +162,13 @@ class FeedFragment : Fragment() {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+//binding. newer.visibility = if (binding.newer.visibility == View.VISIBLE) {
+//    View.INVISIBLE  //невидимая
+//} else {
+//    View.VISIBLE
+//}
+//
+//}
 
 
 
