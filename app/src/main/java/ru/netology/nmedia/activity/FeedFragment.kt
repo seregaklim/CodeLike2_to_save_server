@@ -1,5 +1,6 @@
 
 package ru.netology.nmedia.activity
+
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -39,7 +40,6 @@ class FeedFragment : Fragment() {
                 override fun onEdit(post: Post) {
                     viewModel.edit(post)
                 }
-
 
                 override fun onLike(post: Post) {
                     if (post.likedByMe) {
@@ -109,17 +109,18 @@ class FeedFragment : Fragment() {
             binding.emptyText.isVisible = state.empty
         })
 
-                                                                                                                                                                binding. newer.visibility = View.INVISIBLE  //невидимая
-
+        binding.newer.visibility = View.INVISIBLE
         viewModel.newerCount.observe(viewLifecycleOwner) {
-            viewModel.countMessegePost()
-            Snackbar.make(binding.root,R.string.add_post, Snackbar.LENGTH_LONG).show()
-            binding.newer.visibility =   if (it== 0) {
+
+            binding.newer.visibility = if (it == 0) {
                 View.INVISIBLE  //невидимая
-            } else View.VISIBLE
+            } else {
+                //  Snackbar.make(binding.root, R.string.add_post, Snackbar.LENGTH_LONG).show()
+                View.VISIBLE
+            }
+            viewModel.countMessegePost()
             binding.newer.text = it.toString()
         }
-
 
         binding.swiperefresh.setOnRefreshListener {
             viewModel.refreshPosts()
@@ -136,6 +137,7 @@ class FeedFragment : Fragment() {
         }
 
         return binding.root
-
     }
 }
+
+

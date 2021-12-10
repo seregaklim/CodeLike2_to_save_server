@@ -48,7 +48,8 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
             }
 
             val body = response.body() ?: throw ApiError(response.code(), response.message())
-            dao.insert(body.toEntity())
+            //не нужен, обнуляет newer
+//            dao.insert(body.toEntity())
             emit(body.size)
         }
 
