@@ -1,9 +1,9 @@
 package ru.netology.nmedia.activity
-
 import android.app.Activity
 import android.net.Uri
 import android.os.Bundle
 import android.view.*
+import android.widget.PopupMenu
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.net.toFile
 import androidx.fragment.app.Fragment
@@ -12,6 +12,7 @@ import androidx.navigation.fragment.findNavController
 import com.github.dhaval2404.imagepicker.ImagePicker
 import com.github.dhaval2404.imagepicker.constant.ImageProvider
 import com.google.android.material.snackbar.Snackbar
+import ru.netology.nmedia.BuildConfig
 import ru.netology.nmedia.R
 import ru.netology.nmedia.activity.NewPostFragment.Companion.textArg
 import ru.netology.nmedia.databinding.FragmentLargePhotoBinding
@@ -19,6 +20,7 @@ import ru.netology.nmedia.databinding.FragmentNewPostBinding
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.util.AndroidUtils
 import ru.netology.nmedia.util.StringArg
+import ru.netology.nmedia.view.loadCircleCrop
 import ru.netology.nmedia.viewmodel.PostViewModel
 
 class LargePhotoFragment: Fragment() {
@@ -51,14 +53,12 @@ class LargePhotoFragment: Fragment() {
             )
             fragmentBinding = binding
 
+
             arguments?.textArg
                 ?.let(binding.like::setText,)
 
             arguments?.textArg
                 ?.let(binding.share::setText,)
-
-
-
 
 
             viewModel.postCreated.observe(viewLifecycleOwner) {

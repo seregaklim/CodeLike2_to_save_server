@@ -1,8 +1,10 @@
 
 package ru.netology.nmedia.adapter
 
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.PopupMenu
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -11,9 +13,8 @@ import ru.netology.nmedia.BuildConfig
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.CardPostBinding
 import ru.netology.nmedia.dto.Post
+import ru.netology.nmedia.enumeration.AttachmentType
 import ru.netology.nmedia.view.loadCircleCrop
-
-
 
 
 interface OnInteractionListener {
@@ -58,7 +59,9 @@ class PostViewHolder(
             avatar.loadCircleCrop("${BuildConfig.BASE_URL}/avatars/${post.authorAvatar}")
             like.isChecked = post.likedByMe
             like.text = "${post.likes}"
-    //    photo.text = post.attachment
+
+            photo.setImageURI(Uri.parse( "${post.attachment}"))
+
 
             menu.setOnClickListener {
                 PopupMenu(it.context, it).apply {
@@ -96,6 +99,7 @@ class PostViewHolder(
 
     }
 }
+
 
 
 class PostDiffCallback : DiffUtil.ItemCallback<Post>() {
