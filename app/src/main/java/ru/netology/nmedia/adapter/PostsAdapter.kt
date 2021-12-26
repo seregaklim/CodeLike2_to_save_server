@@ -6,9 +6,11 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.PopupMenu
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import ru.netology.nmedia.BuildConfig
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.CardPostBinding
@@ -60,8 +62,15 @@ class PostViewHolder(
             like.isChecked = post.likedByMe
             like.text = "${post.likes}"
 
-            photo.setImageURI(Uri.parse( "${post.attachment}"))
+          //  photo.setImageURI(Uri.parse( "${BuildConfig.BASE_URL}/attachment/моя_картинка.jpg"))
 
+            photo.isVisible = post.attachment != null
+            post.attachment?.let {
+                Glide.with(photo)
+                    .load("${BuildConfig.BASE_URL}/media/${it.url}")
+                    .timeout(10_000)
+                    .into(photo)
+            }
 
             menu.setOnClickListener {
                 PopupMenu(it.context, it).apply {

@@ -149,7 +149,6 @@ class NewPostFragment : Fragment() {
 
 
 
-
 //
 //class NewPostFragment : Fragment() {
 //

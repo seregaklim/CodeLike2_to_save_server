@@ -2,6 +2,7 @@ package ru.netology.nmedia.viewmodel
 
 import android.app.Application
 import android.net.Uri
+import androidx.core.net.toFile
 import androidx.lifecycle.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.catch
@@ -27,11 +28,12 @@ private val empty = Post(
     likes = 0,
     published = "",
     newer =0,
+
     attachment = Attachment (
         url = "http://10.0.2.2:9999/media/d7dff806-4456-4e35-a6a1-9f2278c5d639.png",
         type = AttachmentType.IMAGE
-    ))
-
+    )
+)
 
 class PostViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -122,10 +124,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
                     }
                     _dataState.value = FeedModelState()
                 } catch (e: Exception) {
-                    _error.postValue(ErrorModel(ErrorType.NetworkError, ActionType.Save, e.message ?: "Не сохранился"))
-
-                    edited.postValue(empty)
-                    // _dataState.value = FeedModelState(error = true)
+                    _dataState.value = FeedModelState(error = true)
                 }
             }
         }
