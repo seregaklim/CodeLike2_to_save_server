@@ -24,7 +24,7 @@ interface OnInteractionListener {
     fun onEdit(post: Post) {}
     fun onRemove(post: Post) {}
     fun onShare(post: Post) {}
-    fun pushPhoto () {}
+    fun pushPhoto (post: Post) {}
 }
 
 class PostsAdapter (
@@ -101,7 +101,7 @@ class PostViewHolder(
             }
 
             photoContainer.setOnClickListener {
-                onInteractionListener.pushPhoto()
+                onInteractionListener.pushPhoto(post)
             }
 
         }

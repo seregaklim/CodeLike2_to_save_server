@@ -12,8 +12,11 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
+import ru.netology.nmedia.BuildConfig
 import ru.netology.nmedia.R
+import ru.netology.nmedia.activity.NewPostFragment.Companion.textArg
 import ru.netology.nmedia.adapter.OnInteractionListener
 import ru.netology.nmedia.adapter.PostsAdapter
 import ru.netology.nmedia.databinding.FragmentFeedBinding
@@ -43,9 +46,10 @@ class FeedFragment : Fragment() {
                     viewModel.edit(post)
                 }
 
-                override fun   pushPhoto () {
-                    findNavController().navigate(R.id.action_feedFragment_to_largePhotoFragment)
-
+                override fun   pushPhoto (post: Post) {
+                    findNavController().navigate(R.id.action_feedFragment_to_largePhotoFragment,
+                      Bundle().apply {textArg= post.attachment.toString() },
+                        )
                 }
 
                 override fun onLike(post: Post) {
@@ -60,8 +64,6 @@ class FeedFragment : Fragment() {
                     viewModel.removeById(post.id)
                 }
 
-
-
                 override fun onShare(post: Post) {
                     val intent = Intent().apply {
                         action = Intent.ACTION_SEND
@@ -73,7 +75,7 @@ class FeedFragment : Fragment() {
                         Intent.createChooser(intent, getString(R.string.chooser_share_post))
                     startActivity(shareIntent)
                 }
-            },
+            }
         )
 
         binding.list.adapter = adapter
