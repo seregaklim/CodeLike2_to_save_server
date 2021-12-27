@@ -96,11 +96,19 @@ class LargePhotoFragment: Fragment() {
 
                 binding.share.setOnClickListener {
 
+                    fun onShare(post: Post) {
+                        val intent = Intent().apply {
+                            action = Intent.ACTION_SEND
+                            putExtra(Intent.EXTRA_TEXT, post.content)
+                            type = "text/plain"
+                        }
 
-                    //  findNavController().navigateUp()
+                        //  findNavController().navigateUp()
+                    }
                 }
             }
         }
+
         return binding.root
 
     }
