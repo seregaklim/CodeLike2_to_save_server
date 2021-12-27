@@ -67,8 +67,6 @@ class LargePhotoFragment: Fragment() {
                     like.isChecked = post.likedByMe
                     like.text = "${post.likes}"
 
-                    photo.setImageURI(Uri.parse("${BuildConfig.BASE_URL}/attachment/моя_картинка.jpg"))
-
                     photo.isVisible = post.attachment != null
                     post.attachment?.let {
                         Glide.with(photo)
