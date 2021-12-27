@@ -75,40 +75,35 @@ class LargePhotoFragment: Fragment() {
                             .into(photo)
                     }
 
-                }
+                    like.setOnClickListener {
 
+                        fun onLike(post: Post) {
+                            if (post.likedByMe) {
+                                viewModel.unlikeById(post.id)
+                            } else {
+                                viewModel.likeById(post.id)
+                            }
+                        }
 
-                binding.like.setOnClickListener {
+                        binding.share.setOnClickListener {
 
-                    fun onLike(post: Post) {
-                        if (post.likedByMe) {
-                            viewModel.unlikeById(post.id)
-                        } else {
-                            viewModel.likeById(post.id)
+                            fun onShare(post: Post) {
+                                val intent = Intent().apply {
+                                    action = Intent.ACTION_SEND
+                                    putExtra(Intent.EXTRA_TEXT, post.content)
+                                    type = "text/plain"
+                                }
+
+                            }
+
                         }
                     }
 
-
-                    //  findNavController().navigateUp()
                 }
 
-                binding.share.setOnClickListener {
-
-                    fun onShare(post: Post) {
-                        val intent = Intent().apply {
-                            action = Intent.ACTION_SEND
-                            putExtra(Intent.EXTRA_TEXT, post.content)
-                            type = "text/plain"
-                        }
-
-                        //  findNavController().navigateUp()
-                    }
-                }
             }
+            return binding.root
         }
-
-        return binding.root
-
     }
 }
 
