@@ -25,10 +25,10 @@ import ru.netology.nmedia.util.StringArg
 import ru.netology.nmedia.view.loadCircleCrop
 import ru.netology.nmedia.viewmodel.PostViewModel
 import androidx.fragment.app.viewModels
-import ru.netology.nmedia.adapter.OnInteractionListener
 import ru.netology.nmedia.adapter.PostViewHolder
 import ru.netology.nmedia.adapter.PostsAdapter
 import ru.netology.nmedia.databinding.CardPostBinding
+import ru.netology.nmedia.adapter.OnInteractionListener as OnInteractionListener
 
 
 class LargePhotoFragment: Fragment() {
@@ -40,6 +40,9 @@ class LargePhotoFragment: Fragment() {
     private val viewModel: PostViewModel by viewModels(
         ownerProducer = ::requireParentFragment
     )
+    private var fragmentBinding: FragmentLargePhotoBinding? = null
+
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -51,6 +54,8 @@ class LargePhotoFragment: Fragment() {
             container,
             false
         )
+
+        fragmentBinding = binding
 
         arguments?.textArg
             ?.let(binding.like::setText)
@@ -65,10 +70,10 @@ class LargePhotoFragment: Fragment() {
                 binding.apply {
 
                     like.isChecked = post.likedByMe
-                    like.text = "${post.likes}"
+                    like.text = "${binding.like.text.toString()}"
 
                     photo.isVisible = post.attachment != null
-                    post.attachment?.let {
+                    val let = post.attachment?.let {
                         Glide.with(photo)
                             .load("${BuildConfig.BASE_URL}/media/${it.url}")
                             .timeout(10_000)
@@ -77,25 +82,20 @@ class LargePhotoFragment: Fragment() {
 
                     like.setOnClickListener {
 
-                        fun onLike(post: Post) {
-                            if (post.likedByMe) {
-                                viewModel.unlikeById(post.id)
-                            } else {
-                                viewModel.likeById(post.id)
-                            }
+                        if (post.likedByMe) {
+                            viewModel.unlikeById(post.id)
+                        } else {
+                            viewModel.likeById(post.id)
+
                         }
 
                         binding.share.setOnClickListener {
 
-                            fun onShare(post: Post) {
                                 val intent = Intent().apply {
                                     action = Intent.ACTION_SEND
                                     putExtra(Intent.EXTRA_TEXT, post.content)
                                     type = "text/plain"
                                 }
-
-                            }
-
                         }
                     }
 

@@ -65,6 +65,7 @@ class PostViewHolder(
           //  photo.setImageURI(Uri.parse( "${BuildConfig.BASE_URL}/attachment/моя_картинка.jpg"))
 
             photo.isVisible = post.attachment != null
+           photoContainer
             post.attachment?.let {
                 Glide.with(photo)
                     .load("${BuildConfig.BASE_URL}/media/${it.url}")

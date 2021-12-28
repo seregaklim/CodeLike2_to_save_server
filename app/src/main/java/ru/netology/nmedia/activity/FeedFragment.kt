@@ -48,9 +48,15 @@ class FeedFragment : Fragment() {
 
                 override fun   pushPhoto (post: Post) {
                     findNavController().navigate(R.id.action_feedFragment_to_largePhotoFragment,
-                      Bundle().apply {textArg= post.attachment.toString() },
-                        )
+                        Bundle().apply {
+                            post.attachment?.let {
+                                textArg = "${BuildConfig.BASE_URL}/media/${it.url}${post.likes}"
+
+                            }
+                        }
+                    )
                 }
+
 
                 override fun onLike(post: Post) {
                     if (post.likedByMe) {
