@@ -1,3 +1,8 @@
+
+
+
+
+
 package ru.netology.nmedia.activity
 
 import android.app.Activity
@@ -135,10 +140,6 @@ class NewPostFragment : Fragment() {
         super.onDestroyView()
     }
 }
-
-
-
-
 
 
 

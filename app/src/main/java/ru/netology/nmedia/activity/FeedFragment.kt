@@ -20,6 +20,7 @@ import ru.netology.nmedia.activity.NewPostFragment.Companion.textArg
 import ru.netology.nmedia.adapter.OnInteractionListener
 import ru.netology.nmedia.adapter.PostsAdapter
 import ru.netology.nmedia.databinding.FragmentFeedBinding
+import ru.netology.nmedia.dto.Attachment
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.enumeration.AttachmentType
 import ru.netology.nmedia.model.ActionType
@@ -50,13 +51,11 @@ class FeedFragment : Fragment() {
                     findNavController().navigate(R.id.action_feedFragment_to_largePhotoFragment,
                         Bundle().apply {
                             post.attachment?.let {
-                                textArg = "${BuildConfig.BASE_URL}/media/${it.url}${post.likes}"
-
+                               textArg = "${BuildConfig.BASE_URL}/media/${it.url}"
                             }
                         }
                     )
                 }
-
 
                 override fun onLike(post: Post) {
                     if (post.likedByMe) {

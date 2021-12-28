@@ -2,6 +2,7 @@
 package ru.netology.nmedia.adapter
 
 import android.net.Uri
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -65,13 +66,15 @@ class PostViewHolder(
           //  photo.setImageURI(Uri.parse( "${BuildConfig.BASE_URL}/attachment/моя_картинка.jpg"))
 
             photo.isVisible = post.attachment != null
-           photoContainer
             post.attachment?.let {
+                Log.d("MyLog", "${BuildConfig.BASE_URL}/media/${it.url}")
                 Glide.with(photo)
                     .load("${BuildConfig.BASE_URL}/media/${it.url}")
                     .timeout(10_000)
                     .into(photo)
             }
+
+
 
             menu.setOnClickListener {
                 PopupMenu(it.context, it).apply {
