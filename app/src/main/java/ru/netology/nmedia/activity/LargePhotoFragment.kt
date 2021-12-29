@@ -35,38 +35,6 @@ import ru.netology.nmedia.adapter.OnInteractionListener as OnInteractionListener
 
 
 class LargePhotoFragment: Fragment() {
-    val adapter = PostsAdapter(
-
-
-
-
-        object : OnInteractionListener {
-
-            override fun onLike(post: Post) {
-                if (post.likedByMe) {
-                    viewModel.unlikeById(post.id)
-                } else {
-                    viewModel.likeById(post.id)
-                }
-            }
-
-            override fun onRemove(post: Post) {
-                viewModel.removeById(post.id)
-            }
-
-            override fun onShare(post: Post) {
-                val intent = Intent().apply {
-                    action = Intent.ACTION_SEND
-                    putExtra(Intent.EXTRA_TEXT, post.content)
-                    type = "text/plain"
-                }
-
-                val shareIntent =
-                    Intent.createChooser(intent, getString(R.string.chooser_share_post))
-                startActivity(shareIntent)
-            }
-        }
-    )
 
     companion object {
         var Bundle.textArg: String? by StringArg
@@ -89,13 +57,14 @@ class LargePhotoFragment: Fragment() {
             container,
             false
         )
+
         val post = Post(
             id = 0,
             content = "",
             author = "",
             authorAvatar = "",
             likedByMe = false,
-            likes = 0,
+            likes =    0,
             published = "",
             newer = 0,
 
@@ -107,15 +76,9 @@ class LargePhotoFragment: Fragment() {
 
         fragmentBinding = binding
 
-        arguments?.textArg
-            ?.let(binding.like::setText)
-
-
         binding.apply {
-
             like.isChecked = post.likedByMe
-            like.text = "${binding.like.text.toString()}"
-
+            like.text =arguments?.getString("likes")
 
             photo.isVisible = post.attachment != null
             post.attachment?.let {
@@ -123,7 +86,9 @@ class LargePhotoFragment: Fragment() {
                 Log.d("MyLog", "${BuildConfig.BASE_URL}/media/${it.url}")
 
                 Glide.with(photo)
-                    .load(arguments?.textArg)
+                    //  .load(arguments?.textArg)
+                    .load(  arguments?.getString("url"))
+
                     .timeout(10_000)
                     .into(photo)
 
