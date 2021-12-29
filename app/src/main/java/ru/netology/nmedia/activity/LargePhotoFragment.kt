@@ -3,7 +3,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import ru.netology.nmedia.BuildConfig
@@ -28,8 +27,6 @@ class LargePhotoFragment: Fragment() {
     )
     private var fragmentBinding: FragmentLargePhotoBinding? = null
 
-
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -46,7 +43,7 @@ class LargePhotoFragment: Fragment() {
             content = "",
             author = "",
             authorAvatar = "",
-            likedByMe = false,
+            likedByMe =  false,
             likes =    0,
             published = "",
             newer = 0,
@@ -57,14 +54,15 @@ class LargePhotoFragment: Fragment() {
             )
         )
 
-         arguments?.getString("likes")
+        arguments?.getString("likes")
             ?.let(binding.like::setText)
 
-        binding.apply {
-            like.isChecked = post.likedByMe
-            like.text =arguments?.getString("likes")
 
-            photo.isVisible = post.attachment != null
+        binding.apply {
+            post.likedByMe = arguments?.getBoolean("likedByMeTrue") == true
+            like.text =arguments?.getString("likes")
+            like.isChecked =post.likedByMe
+
             post.attachment?.let {
 
                 Log.d("MyLog", "${BuildConfig.BASE_URL}/media/${it.url}")
@@ -77,34 +75,34 @@ class LargePhotoFragment: Fragment() {
                 like.setOnClickListener {
 
 
-                        if (post.likedByMe) {
-                            viewModel.unlikeById(it.id.toLong())
-                        } else {
-                            viewModel.likeById(it.id.toLong())
-                        }
-
+                    if (post.likedByMe) {
+                        viewModel.unlikeById(it.id.toLong())
+                    } else {
+                        viewModel.likeById(it.id.toLong())
                     }
 
-                    binding.share.setOnClickListener {
+                }
 
-                            val intent = Intent().apply {
-                                action = Intent.ACTION_SEND
-                                putExtra(Intent.EXTRA_TEXT, post.content)
-                                type = "text/plain"
-                            }
+                binding.share.setOnClickListener {
 
-                            val shareIntent =
-                                Intent.createChooser(intent, getString(R.string.chooser_share_post))
-                            startActivity(shareIntent)
-                        }
+                    val intent = Intent().apply {
+                        action = Intent.ACTION_SEND
+                        putExtra(Intent.EXTRA_TEXT, post.content)
+                        type = "text/plain"
+                    }
 
+                    val shareIntent =
+                        Intent.createChooser(intent, getString(R.string.chooser_share_post))
+                    startActivity(shareIntent)
                 }
 
             }
 
-            return binding.root
         }
+
+        return binding.root
     }
+}
 
 
 

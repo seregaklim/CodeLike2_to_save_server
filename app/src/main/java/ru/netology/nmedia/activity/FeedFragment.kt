@@ -49,11 +49,14 @@ class FeedFragment : Fragment() {
 
                                 putString("url", "${BuildConfig.BASE_URL}/media/${it.url}")
                                 putString("likes", "${post.likes}")
+                                if (post.likedByMe) {
+                                    putBoolean("likedByMeTrue", true)
+                                } else {
+
+                                }
                             }
                         }
-
                     )
-
                 }
                 override fun onLike(post: Post) {
                     if (post.likedByMe) {
