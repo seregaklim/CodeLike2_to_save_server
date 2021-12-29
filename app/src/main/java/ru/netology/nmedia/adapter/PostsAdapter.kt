@@ -1,17 +1,22 @@
 
 package ru.netology.nmedia.adapter
 
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
+import android.net.Uri
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.PopupMenu
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import ru.netology.nmedia.BuildConfig
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.CardPostBinding
 import ru.netology.nmedia.dto.Post
+import ru.netology.nmedia.enumeration.AttachmentType
 import ru.netology.nmedia.view.loadCircleCrop
 
 
@@ -20,7 +25,7 @@ interface OnInteractionListener {
     fun onEdit(post: Post) {}
     fun onRemove(post: Post) {}
     fun onShare(post: Post) {}
-    fun onNewer(){}
+    fun pushPhoto (post: Post) {}
 }
 
 class PostsAdapter (
@@ -57,7 +62,19 @@ class PostViewHolder(
             avatar.loadCircleCrop("${BuildConfig.BASE_URL}/avatars/${post.authorAvatar}")
             like.isChecked = post.likedByMe
             like.text = "${post.likes}"
-            newer.text= post.newer.toString()
+
+          //  photo.setImageURI(Uri.parse( "${BuildConfig.BASE_URL}/attachment/моя_картинка.jpg"))
+
+            photo.isVisible = post.attachment != null
+            post.attachment?.let {
+                Log.d("MyLog", "${BuildConfig.BASE_URL}/media/${it.url}")
+                Glide.with(photo)
+                    .load("${BuildConfig.BASE_URL}/media/${it.url}")
+                    .timeout(10_000)
+                    .into(photo)
+            }
+
+
 
             menu.setOnClickListener {
                 PopupMenu(it.context, it).apply {
@@ -87,14 +104,15 @@ class PostViewHolder(
                 onInteractionListener.onShare(post)
             }
 
-       newer.setOnClickListener {
-           onInteractionListener.onNewer()
-       }
+            photoContainer.setOnClickListener {
+                onInteractionListener.pushPhoto(post)
+            }
 
         }
-    }
 
+    }
 }
+
 
 
 class PostDiffCallback : DiffUtil.ItemCallback<Post>() {
