@@ -1,37 +1,20 @@
 package ru.netology.nmedia.activity
-import android.app.Activity
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import android.widget.PopupMenu
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.net.toFile
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
-import com.github.dhaval2404.imagepicker.ImagePicker
-import com.github.dhaval2404.imagepicker.constant.ImageProvider
-import com.google.android.material.snackbar.Snackbar
 import ru.netology.nmedia.BuildConfig
 import ru.netology.nmedia.R
-import ru.netology.nmedia.activity.NewPostFragment.Companion.textArg
 import ru.netology.nmedia.databinding.FragmentLargePhotoBinding
-import ru.netology.nmedia.databinding.FragmentNewPostBinding
 import ru.netology.nmedia.dto.Post
-import ru.netology.nmedia.util.AndroidUtils
 import ru.netology.nmedia.util.StringArg
-import ru.netology.nmedia.view.loadCircleCrop
 import ru.netology.nmedia.viewmodel.PostViewModel
 import androidx.fragment.app.viewModels
-import ru.netology.nmedia.adapter.PostViewHolder
-import ru.netology.nmedia.adapter.PostsAdapter
-import ru.netology.nmedia.databinding.CardPostBinding
 import ru.netology.nmedia.dto.Attachment
 import ru.netology.nmedia.enumeration.AttachmentType
-import ru.netology.nmedia.adapter.OnInteractionListener as OnInteractionListener
 
 
 class LargePhotoFragment: Fragment() {
@@ -74,7 +57,8 @@ class LargePhotoFragment: Fragment() {
             )
         )
 
-        fragmentBinding = binding
+         arguments?.getString("likes")
+            ?.let(binding.like::setText)
 
         binding.apply {
             like.isChecked = post.likedByMe
@@ -86,29 +70,34 @@ class LargePhotoFragment: Fragment() {
                 Log.d("MyLog", "${BuildConfig.BASE_URL}/media/${it.url}")
 
                 Glide.with(photo)
-                    //  .load(arguments?.textArg)
                     .load(  arguments?.getString("url"))
-
                     .timeout(10_000)
                     .into(photo)
 
                 like.setOnClickListener {
 
-                    if (post.likedByMe) {
-                        viewModel.unlikeById(post.id)
-                    } else {
-                        viewModel.likeById(post.id)
+
+                        if (post.likedByMe) {
+                            viewModel.unlikeById(it.id.toLong())
+                        } else {
+                            viewModel.likeById(it.id.toLong())
+                        }
 
                     }
 
                     binding.share.setOnClickListener {
 
-                        val intent = Intent().apply {
-                            action = Intent.ACTION_SEND
-                            putExtra(Intent.EXTRA_TEXT, post.content)
-                            type = "text/plain"
+                            val intent = Intent().apply {
+                                action = Intent.ACTION_SEND
+                                putExtra(Intent.EXTRA_TEXT, post.content)
+                                type = "text/plain"
+                            }
+
+                            val shareIntent =
+                                Intent.createChooser(intent, getString(R.string.chooser_share_post))
+                            startActivity(shareIntent)
                         }
-                    }
+
                 }
 
             }
@@ -116,7 +105,7 @@ class LargePhotoFragment: Fragment() {
             return binding.root
         }
     }
-}
+
 
 
 

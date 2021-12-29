@@ -2,7 +2,6 @@ package ru.netology.nmedia.viewmodel
 
 import android.app.Application
 import android.net.Uri
-import androidx.core.net.toFile
 import androidx.lifecycle.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.catch

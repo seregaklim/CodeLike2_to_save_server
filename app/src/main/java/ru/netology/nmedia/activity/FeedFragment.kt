@@ -2,27 +2,21 @@
 package ru.netology.nmedia.activity
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.accessibility.AccessibilityEventCompat.setAction
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
 import ru.netology.nmedia.BuildConfig
 import ru.netology.nmedia.R
-import ru.netology.nmedia.activity.NewPostFragment.Companion.textArg
 import ru.netology.nmedia.adapter.OnInteractionListener
 import ru.netology.nmedia.adapter.PostsAdapter
 import ru.netology.nmedia.databinding.FragmentFeedBinding
-import ru.netology.nmedia.dto.Attachment
 import ru.netology.nmedia.dto.Post
-import ru.netology.nmedia.enumeration.AttachmentType
 import ru.netology.nmedia.model.ActionType
 import ru.netology.nmedia.viewmodel.PostViewModel
 
