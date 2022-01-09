@@ -1,4 +1,5 @@
 package ru.netology.nmedia.model
 
-class PhotoModel {
-}
+import android.net.Uri
+
+data class PhotoModel(val uri: Uri? = null)
