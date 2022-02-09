@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import ru.netology.nmedia.BuildConfig
@@ -13,14 +14,24 @@ import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.util.StringArg
 import ru.netology.nmedia.viewmodel.PostViewModel
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.map
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.flow.collectLatest
+import ru.netology.nmedia.adapter.PostsAdapter
+import ru.netology.nmedia.api.Api.service
 import ru.netology.nmedia.dto.Attachment
 import ru.netology.nmedia.enumeration.AttachmentType
+import ru.netology.nmedia.model.ActionType
+import ru.netology.nmedia.model.FeedModel
 import ru.netology.nmedia.viewmodel.AuthViewModel
 
 
-class FragmentLargePhoto: Fragment() {
 
+
+class FragmentLargePhoto: Fragment() {
 
 
     private val viewModel: PostViewModel by viewModels(ownerProducer = ::requireParentFragment)
@@ -30,7 +41,7 @@ class FragmentLargePhoto: Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val binding = ru.netology.nmedia.databinding.FragmentLargePhotoBinding.inflate(
+        val binding = FragmentLargePhotoBinding.inflate(
             inflater,
             container,
             false
@@ -50,43 +61,71 @@ class FragmentLargePhoto: Fragment() {
                 url = "http://10.0.2.2:9999/media/d7dff806-4456-4e35-a6a1-9f2278c5d639.png",
                 type = AttachmentType.IMAGE
             )
-        )
-
-
-        arguments?.getString("likes")
-            ?.let(binding.like::setText)
-
-        arguments?.getString("likes")
+     )
 
 
         val service = Wallsevice()
-        binding.apply {
-            post.likedByMe = arguments?.getBoolean("likedByMeTrue") == true
-            like.text =arguments?.getString("likes")
 
-            like.isChecked = post.likedByMe
-            like.text = "${service.zeroingOutLikes(post.likes.toLong())}"
+        binding.apply {
+
             post.attachment?.let {
 
                 Log.d("MyLog", "${BuildConfig.BASE_URL}/media/${it.url}")
 
                 Glide.with(photo)
-                    .load(  arguments?.getString("url"))
+                    .load(arguments?.getString("url"))
                     .timeout(10_000)
                     .into(photo)
+            }
 
 
-                binding.like.setOnClickListener {
+                        arguments?.getString("likes")
+                            ?.let(binding.like::setText)
 
-                    if (post.likedByMe) {
+                        post.likedByMe = arguments?.getBoolean("likedByMeTrue") == true
+                        like.isChecked = post.likedByMe
+
+
+
+
+//            binding.like.setOnClickListener {
+//
+//                    viewModel.data. observe(viewLifecycleOwner){posts ->
+//                        posts.posts.find {it.id == post.id}?.let {
+//                            if (it.likedByMe) {
+//                                viewModel.unlikeById(post.id.toLong())
+//                            } else {
+//                                viewModel.likeById(post.id.toLong())
+//                            }
+//                        }
+//                    }
+//
+//            }
+
+
+//подписка feedmodel
+            viewModel.data. observe(viewLifecycleOwner){posts ->
+                posts.posts.find {it.id == post.id}?.let {
+
+                    like.isChecked = it.likedByMe
+                     like.text = "${it.likes}"
+
+                }
+
+            }
+
+
+            binding.like.setOnClickListener {
+                viewModel.data.value?.posts?.find {it.id == post.id}?.let {
+                    if (it.likedByMe) {
                         viewModel.unlikeById(it.id.toLong())
                     } else {
                         viewModel.likeById(it.id.toLong())
                     }
                 }
+            }
 
-
-                binding.share.setOnClickListener {
+            binding.share.setOnClickListener {
 
                     val intent = Intent().apply {
                         action = Intent.ACTION_SEND
@@ -99,10 +138,27 @@ class FragmentLargePhoto: Fragment() {
                     startActivity(shareIntent)
                 }
 
+            viewModel.error.observe(viewLifecycleOwner) { error ->
+                Snackbar.make(
+                    binding.root,
+                    "${getString(R.string.error_loading)}: ${error.message}",
+
+                    Snackbar.LENGTH_INDEFINITE
+                ).apply {
+                    setAction(R.string.retry_loading) {
+                        when (error.action) {
+
+                            ActionType.Like -> viewModel.likeById(id.toLong())
+                            ActionType.unlikeById -> viewModel.unlikeById(id.toLong())
+                        }
+                    }
+                    show()
+                }
             }
 
-        }
+            }
 
         return binding.root
     }
 }
+
