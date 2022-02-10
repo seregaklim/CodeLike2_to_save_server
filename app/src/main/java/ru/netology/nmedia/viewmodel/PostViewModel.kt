@@ -1,46 +1,77 @@
 package ru.netology.nmedia.viewmodel
 
 import android.app.Application
+import android.net.Uri
+import androidx.core.net.toFile
 import androidx.lifecycle.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import retrofit2.http.Field
+import ru.netology.nmedia.auth.AppAuth
+import ru.netology.nmedia.auth.AuthState
 import ru.netology.nmedia.db.AppDb
-import ru.netology.nmedia.dto.Post
+import ru.netology.nmedia.dto.*
+import ru.netology.nmedia.enumeration.AttachmentType
 import ru.netology.nmedia.model.*
 import ru.netology.nmedia.repository.PostRepository
 import ru.netology.nmedia.repository.PostRepositoryImpl
 import ru.netology.nmedia.util.SingleLiveEvent
+import java.io.File
 
 private val empty = Post(
     id = 0,
     content = "",
     author = "",
     authorAvatar = "",
+    authorId = 0,
     likedByMe = false,
     likes = 0,
     published = "",
-    newer=0,
+    newer =0,
+    attachment = Attachment (
+        url = "http://10.0.2.2:9999/media/d7dff806-4456-4e35-a6a1-9f2278c5d639.png",
+        type = AttachmentType.IMAGE
+    )
 )
 
-class PostViewModel(application: Application) : AndroidViewModel(application) {
 
+@ExperimentalCoroutinesApi
+class PostViewModel(application: Application) : AndroidViewModel(application) {
     // упрощённый вариант
+
+
     private val repository: PostRepository =
         PostRepositoryImpl(AppDb.getInstance(context = application).postDao())
 
     //Для реализации репозитория мы можем добавить явное указание того,
     // какой контекст использовать для работы с помощью flowOn:
-    val data: LiveData<FeedModel> = repository.data
-        .map(::FeedModel)
-        .asLiveData(Dispatchers.Default)
+
+    val data: LiveData<FeedModel> = AppAuth.getInstance( )
+        .authStateFlow
+        .flatMapLatest { (myId, _) ->
+            repository.data
+                .map { posts ->
+                    FeedModel(
+                       posts.map { it.copy(ownedByMe = it.authorId == myId)
+
+                        },
+
+                        posts.isEmpty()
+                    )
+                }
+        }.asLiveData(Dispatchers.Default)
+
+
 
     private val _dataState = MutableLiveData<FeedModelState>()
     val dataState: LiveData<FeedModelState>
         get() = _dataState
 
-//    switchMap позволяет нам подписаться на изменения data и на основании этого получить новую LiveData.
+    //    switchMap позволяет нам подписаться на изменения data и на основании этого получить новую LiveData.
 //     Т. е.  «предыдущему» Flow будет отправлен cancel, что приведёт к выбросу CancellationException.
     val newerCount: LiveData<Int> = data.switchMap {
         repository.getNewerCount(it.posts.firstOrNull()?.id ?: 0L)
@@ -58,10 +89,15 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     val error: LiveData<ErrorModel>
         get() = _error
 
+    private val noPhoto = PhotoModel()
+    private val _photo = MutableLiveData(noPhoto)
+    val photo: LiveData<PhotoModel>
+        get() = _photo
 
     init {
         loadPosts()
     }
+
 
     fun loadPosts() = viewModelScope.launch {
         try {
@@ -95,33 +131,31 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
             //  _dataState.value = FeedModelState(error = true)
         }
     }
-
     fun save() {
         edited.value?.let {
             _postCreated.value = Unit
             viewModelScope.launch {
                 try {
-                    repository.save(it)
+                    when(_photo.value) {
+                        noPhoto -> repository.save(it)
+                        else -> _photo.value?.file?.let { file ->
+                            repository.saveWithAttachment(it, MediaUpload(file))
+                        }
+                    }
                     _dataState.value = FeedModelState()
                 } catch (e: Exception) {
-                    _error.postValue(
-                        ErrorModel(
-                            ErrorType.NetworkError,
-                            ActionType.Save, e.message ?: "Не сохранился"
-                        )
-                    )
-                    edited.postValue(empty)
-
-                    // _dataState.value = FeedModelState(error = true)
+                    _dataState.value = FeedModelState(error = true)
                 }
             }
         }
         edited.value = empty
+        _photo.value = noPhoto
     }
 
-    fun edit(post: Post) {
+    fun edit(post: Post){
         edited.value = post
-    }
+
+        }
 
     fun changeContent(content: String) {
         val text = content.trim()
@@ -131,6 +165,9 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         edited.value = edited.value?.copy(content = text)
     }
 
+    fun changePhoto(uri: Uri?, file: File?) {
+        _photo.value = PhotoModel(uri, file)
+    }
 
     fun likeById(id: Long) = viewModelScope.launch {
         try {
@@ -171,20 +208,20 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun countMessegePost ()= viewModelScope.launch {
-            try {
-                repository.countMessegePost()
-            } catch (e: Exception) {
+        try {
+            repository.countMessegePost()
+        } catch (e: Exception) {
 
-                _error.postValue(
-                    ErrorModel(
-                        ErrorType.NetworkError,
-                        ActionType.CountMessegePost, e.message ?: ""
-                    )
+            _error.postValue(
+                ErrorModel(
+                    ErrorType.NetworkError,
+                    ActionType.CountMessegePost, e.message ?: ""
                 )
-
-                //_data.postValue(_data.value?.copy(posts = old))
-            }
+            )
+            //_data.postValue(_data.value?.copy(posts = old))
+        }
     }
+
 
     fun unCountNewer()= viewModelScope.launch {
 
@@ -198,7 +235,6 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
                     ActionType.UnCountMessegePost, e.message ?: ""
                 )
             )
-            //_data.postValue(_data.value?.copy(posts = old))
         }
     }
 
@@ -207,3 +243,25 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
 
 
+//    fun save() {
+//        edited.value?.let {
+//            _postCreated.value = Unit
+//
+//            viewModelScope.launch {
+//
+//
+//                try {
+//                    repository.save(it)
+//                    _dataState.value = FeedModelState()
+//
+//                } catch (e: Exception) {
+//                    _error.postValue(ErrorModel(ErrorType.NetworkError,
+//                        ActionType.Save, e.message ?: "Не сохранился"))
+//                    edited.postValue(empty)
+//
+//                    // _dataState.value = FeedModelState(error = true)
+//                }
+//            }
+//        }
+//        edited.value = empty
+//
