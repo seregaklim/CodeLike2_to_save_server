@@ -3,6 +3,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -56,37 +57,22 @@ class FeedFragment : Fragment() {
                     }
 
                 override fun pushPhoto(post: Post) {
-
-                    if (authViewModel.authenticated) {
-
-
-                            findNavController().navigate(R.id.action_feedFragment_to_fragmentLargePhoto,
-                                Bundle().apply {
-
-                                    post.attachment?.let {
-
-                                        putString("url", "${BuildConfig.BASE_URL}/media/${it.url}")
-                                        putString("likes", "${post.likes}")
-                                        if (post.likedByMe) {
-                                            putBoolean("likedByMeTrue", true)
-                                        } else {
-
-                                        }
-                                    }
-                                }
+                    post.attachment?.let {
+                        if (authViewModel.authenticated) {
+                            findNavController().navigate(
+                                R.id.action_feedFragment_to_fragmentLargePhoto,
+                               //передаем id
+                                bundleOf("id" to post.id)
                             )
-
-
                         } else {
-
                             Snackbar.make(
                                 binding.root,
                                 "${getString(R.string.registered_users)}",
                                 Snackbar.LENGTH_INDEFINITE
-                            )
-                                .show()
+                            ).show()
                         }
                     }
+                }
 
                 override fun onLike(post: Post) {
                     if (authViewModel.authenticated) {
